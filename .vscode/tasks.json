@@ -1,0 +1,79 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "example pathops",
+            "type": "shell",
+            "command": "cargo",
+            "args": ["run", "--example", "pathops"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "example strings educba",
+            "type": "shell",
+            "command": "cargo",
+            "args": ["run", "--example", "strings"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "run app test.svg",
+            "type": "shell",
+            "command": "cargo",
+            "args": ["run", "test.svg"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },        
+        {
+            "label": "run app no args",
+            "type": "shell",
+            "command": "cargo",
+            "args": ["run"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        }        
+    ]
+}
