@@ -7,19 +7,38 @@ use std::process::*;
 // use std::process::Command;
 use std::{io, env};
 use std::path::{Path, PathBuf};
-use std::collections::{HashMap, LinkedList};
+use std::collections::HashMap;
 use std::ffi::{OsStr, OsString};
+use std::borrow::Cow;
 
 #[allow(dead_code)]
 fn print_typename<T>(_: T) { 
     println!("{}", std::any::type_name::<T>());
 }
 
-// TODO: auto generate outputfilepath from input filepath
-// TODO: create command line arguments for inkscape from arg_pattern
-// TODO: replace arguments with PLACEHOLDER
-// TODO: check input != output
 
+fn make_apppath_and_args_hash(infile: &String, outfile: &Cow<str>) -> HashMap<&'static str, Vec<String>> {
+
+    if infile == &outfile.to_string() {
+        eprintln!("Terminated. May be input file and output file are same.\n");
+        eprintln!("in: '{}' vs generated outfilename: '{}'", infile, &outfile);
+        exit(2);
+    }
+
+    HashMap::from([
+        (r"C:\Program Files\Inkscape\inkscape.exe", 
+            vec![
+                String::from(infile),
+                "--export-emf".to_string(),
+                outfile.to_string()
+                ]),
+        (r"C:\Program Files\Inkscape\bin\inkscape.exe", 
+            vec![String::from(infile),
+                "--export-filename".to_string(),
+                outfile.to_string()
+                ]),
+    ])
+}
 
 
 
@@ -42,34 +61,23 @@ fn main() -> io::Result<()> {
     // print_typename(&outfile); // -> &alloc::borrow::Cow<str>
 
 
-    let availables : HashMap<&str, Vec<String>> = HashMap::from([
-        (r"C:\Program Files\Inkscape\inkscape.exe", 
-            vec![
-                String::from(infile),
-                "--export-emf".to_string(),
-                outfile.to_string()
-                ]),
-        (r"C:\Program Files\Inkscape\bin\inkscape.exe", 
-            vec![String::from(infile),
-                "--export-filename".to_string(),
-                outfile.to_string()
-                ]),
-    ]);
-
-    // let availables : HashMap<char, Vec<String>> = HashMap::from([
+    let availables = make_apppath_and_args_hash(infile, &outfile);
+    // let availables : HashMap<&str, Vec<String>> = HashMap::from([
     //     (r"C:\Program Files\Inkscape\inkscape.exe", 
-    //         LinkedList::from([
-    //             infile, 
-    //             &String::from("--export-emf"), 
-    //             &String::from(outfile.to_string_lossy())]) ),
+    //         vec![
+    //             String::from(infile),
+    //             "--export-emf".to_string(),
+    //             outfile.to_string()
+    //             ]),
     //     (r"C:\Program Files\Inkscape\bin\inkscape.exe", 
-    //         LinkedList::from([
-    //             infile, 
-    //             &"--export-filename".to_string(), 
-    //             &outfile.into_os_string().into_string().unwrap()]) ),
+    //         vec![String::from(infile),
+    //             "--export-filename".to_string(),
+    //             outfile.to_string()
+    //             ]),
     // ]);
 
-    print_typename(&availables);
+
+    // print_typename(&availables);
 
     // let foundapp : &str;
     // let arg_pattern : &LinkedList<&String>;
@@ -101,14 +109,14 @@ fn main() -> io::Result<()> {
     }
 
     if foundapp == "" {
-        println!("Inkscape not found");
+        eprintln!("Inkscape not found");
         exit(1);
     }
 
 
     let exit_status = if cfg!(target_os = "windows") {
 
-        println!("convert to test.emf");
+        println!("convert to emf from {}", &infile);
 
         Command::new(&foundapp)
                 // .args([&infile, "--export-filename", &outfile])
@@ -118,7 +126,7 @@ fn main() -> io::Result<()> {
                 .wait()?
 
     } else {
-        println!("Supports windows only");
+        eprintln!("Supports windows only");
         exit(1);
     };
 
@@ -126,14 +134,14 @@ fn main() -> io::Result<()> {
     // println!("{}", exit_status);
     match exit_status.code() {
         Some(code) => {
-            println!("Exit {}", code);
+            println!("Inkscape exit with exitcode: {}", code);
             exit(code);
         },
-        None => println!("terminated")
+        None => eprintln!("Inkscape terminated")
     }
 
 
-    exit(2); // should be unreached.
+    exit(2); 
 
     // Ok(())
 }
